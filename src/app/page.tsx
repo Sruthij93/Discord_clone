@@ -4,8 +4,14 @@ import { useState } from "react";
 //by default next.js tries to render everythig on the server.
 //however, using a hook like useState, those make components interactive, it has to run on the client. it has to be made a client component
 
-import { useQuery, useMutation } from "convex/react";
+import {
+  useQuery,
+  useMutation,
+  Authenticated,
+  Unauthenticated,
+} from "convex/react";
 import { api } from "../../convex/_generated/api";
+import { SignInButton } from "@clerk/nextjs";
 
 // create messages UI that can be connected to the database
 // interface Message {
@@ -33,22 +39,29 @@ export default function Home() {
   };
 
   return (
-    <div>
-      {messages?.map((messages, index) => (
-        <div key={index}>
-          <strong>{messages.sender}</strong>: {messages.content}
+    <>
+      <Authenticated>
+        <div>
+          {messages?.map((messages, index) => (
+            <div key={index}>
+              <strong>{messages.sender}</strong>: {messages.content}
+            </div>
+          ))}
+          <form onSubmit={handleSubmit}>
+            <input
+              type="text"
+              name="message"
+              id="message"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+            />
+            <button type="submit">Send</button>
+          </form>
         </div>
-      ))}
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="message"
-          id="message"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-        />
-        <button type="submit">Send</button>
-      </form>
-    </div>
+      </Authenticated>
+      <Unauthenticated>
+        <SignInButton />
+      </Unauthenticated>
+    </>
   );
 }
